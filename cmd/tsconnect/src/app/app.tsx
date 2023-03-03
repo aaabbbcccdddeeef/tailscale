@@ -43,8 +43,23 @@ class App extends Component<{}, AppState> {
       )
     }
 
+    const lockedOut = netMap && netMap.lockedOut
+    let lockedOutInstructions
+    if (lockedOut) {
+      lockedOutInstructions = (
+        <div class="container mx-auto px-4 text-center">
+          This instance of Tailscale Connect needs to be signed, due to Tailnet Lock being enabled on this domain.
+          <br/> <br/>
+
+          Run the following command on a device with a trusted tailnet-lock key:
+
+          <pre>tailscale lock sign {netMap.self.nodeKey}</pre>
+        </div>
+      )
+    }
+
     let ssh
-    if (ipn && ipnState === "Running" && netMap) {
+    if (ipn && ipnState === "Running" && netMap && !lockedOut) {
       ssh = <SSH netMap={netMap} ipn={ipn} />
     }
 
@@ -55,6 +70,7 @@ class App extends Component<{}, AppState> {
         <div class="flex-grow flex flex-col justify-center overflow-hidden">
           {urlDisplay}
           {machineAuthInstructions}
+          {lockedOutInstructions}
           {ssh}
         </div>
       </>
